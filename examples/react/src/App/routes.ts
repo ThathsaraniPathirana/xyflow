@@ -54,6 +54,7 @@ import AddNodeOnEdgeDrop from '../examples/AddNodeOnEdgeDrop';
 import DevTools from '../examples/DevTools';
 import Redux from '../examples/Redux';
 import MovingHandles from '../examples/MovingHandles';
+import ExpandParent from '../examples/ExpandParent';
 
 export interface IRoute {
   name: string;
@@ -342,6 +343,11 @@ const routes: IRoute[] = [
     path: 'use-key-press',
     component: UseKeyPress,
   },
+  {
+    name: 'expandParent',
+    path: 'expand-parent',
+    component: ExpandParent
+  }
 ];
 
 export default routes;
