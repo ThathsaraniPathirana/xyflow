@@ -20,14 +20,26 @@ const onEdgeClick = (_: MouseEvent, edge: Edge) => console.log('click', edge);
 
 const initialNodes: Node[] = [
   {
+    id: "root",
+    type: "group",
+    data: { label: null },
+    position: { x: -10, y: -10 },
+    style: {
+      width: 210,
+      height: 180,
+    },
+  },
+  {
     id: "top",
     type: "group",
     data: { label: null },
-    position: { x: 0, y: 0 },
+    position: { x: 10, y: 10 },
     style: {
       width: 190,
       height: 160,
     },
+    parentId: "root",
+    expandParent: true
   },
   {
     id: "A",

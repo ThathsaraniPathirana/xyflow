@@ -227,6 +227,7 @@ export function handleExpandParent(
 ): (NodeDimensionChange | NodePositionChange)[] {
   const changes: (NodeDimensionChange | NodePositionChange)[] = [];
   const parentExpansions = new Map<string, { expandedRect: Rect; parent: InternalNodeBase }>();
+  const nextChildren: ParentExpandChild[] = [];
 
   // determine the expanded rectangle the child nodes would take for each parent
   for (const child of children) {
@@ -239,6 +240,14 @@ export function handleExpandParent(
     const expandedRect = getBoundsOfRects(parentRect, child.rect);
 
     parentExpansions.set(child.parentId, { expandedRect, parent });
+
+    if (parent.parentId && parent.expandParent && nodeLookup.get(parent.parentId)) {
+      nextChildren.push({
+        id: parent.id,
+        parentId: parent.parentId,
+        rect: { ...expandedRect }
+      })
+    }
   }
 
   if (parentExpansions.size > 0) {
@@ -262,12 +271,15 @@ export function handleExpandParent(
 
       // We need to correct the position of the parent node if the origin is not [0,0]
       if (xChange > 0 || yChange > 0 || widthChange || heightChange) {
+        const parentX = parent.position.x - xChange + widthChange;
+        const parentY = parent.position.y - yChange + heightChange;
+        const parentExpandsParent = parent.parentId && parent.expandParent && nodeLookup.get(parent.parentId); 
         changes.push({
           id: parentId,
           type: 'position',
           position: {
-            x: parent.position.x - xChange + widthChange,
-            y: parent.position.y - yChange + heightChange,
+            x: parentExpandsParent ? Math.max(parentX, 0) : parentX,
+            y: parentExpandsParent ? Math.max(parentY, 0) : parentY,
           },
         });
 
@@ -302,7 +314,10 @@ export function handleExpandParent(
     });
   }
 
-  return changes;
+  const nextChanges = nextChildren.length > 0
+    ? handleExpandParent(nextChildren, nodeLookup, parentLookup)
+    : []
+  return nextChanges.concat(changes);
 }
 
 export function updateNodeInternals<NodeType extends InternalNodeBase>(
