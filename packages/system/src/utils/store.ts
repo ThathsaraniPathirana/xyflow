@@ -271,15 +271,16 @@ export function handleExpandParent(
 
       // We need to correct the position of the parent node if the origin is not [0,0]
       if (xChange > 0 || yChange > 0 || widthChange || heightChange) {
-        const parentX = parent.position.x - xChange + widthChange;
-        const parentY = parent.position.y - yChange + heightChange;
-        const parentExpandsParent = parent.parentId && parent.expandParent && nodeLookup.get(parent.parentId); 
+        const parentXChange = parent.position.x - xChange + widthChange;
+        const parentYChange = parent.position.y - yChange + heightChange;
+        const parentExpandsParent = parent.expandParent; 
+
         changes.push({
           id: parentId,
           type: 'position',
           position: {
-            x: parentExpandsParent ? Math.max(parentX, 0) : parentX,
-            y: parentExpandsParent ? Math.max(parentY, 0) : parentY,
+            x: parentExpandsParent ? Math.max(parentXChange, 0) : parentXChange,
+            y: parentExpandsParent ? Math.max(parentYChange, 0) : parentYChange,
           },
         });
 
@@ -314,6 +315,7 @@ export function handleExpandParent(
     });
   }
 
+  //Recursively call handleExpandParent
   const nextChanges = nextChildren.length > 0
     ? handleExpandParent(nextChildren, nodeLookup, parentLookup)
     : []
